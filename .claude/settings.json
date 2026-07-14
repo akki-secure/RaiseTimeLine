@@ -14,7 +14,31 @@
       "Bash(kill *)",
       "Bash(pkill *)",
       "Bash(chmod *)",
-      "Bash(chown *)"
+      "Bash(chown *)",
+      "Bash(*DROP TABLE*)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*DROP SCHEMA*)",
+      "Bash(*TRUNCATE*)",
+      "Bash(*DELETE FROM*)",
+      "Bash(psql *-c *DROP*)",
+      "Bash(psql *-c *DELETE*)",
+      "Bash(psql *-c *TRUNCATE*)",
+      "Bash(dropdb *)",
+      "Bash(dropuser *)",
+      "Bash(pg_dump *--clean*)",
+      "Bash(*migrate:reset*)",
+      "Bash(*migrate:rollback*)",
+      "Bash(*migrate:undo*)",
+      "Bash(*migration:revert*)",
+      "Bash(*prisma migrate reset*)",
+      "Bash(*db:reset*)",
+      "Bash(*db:drop*)",
+      "Bash(*flyway clean*)",
+      "Bash(docker *volume rm*)",
+      "Bash(docker-compose down --volumes*)",
+      "Bash(docker-compose down -v*)",
+      "Bash(docker compose down --volumes*)",
+      "Bash(docker compose down -v*)"
     ]
   }
 }
