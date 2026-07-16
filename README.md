@@ -27,6 +27,7 @@ TaskManagementプロジェクトと同一バージョンで統一しています
 | フロントエンド | React 19 + Vite 8 + React Router 7 |
 | バックエンド | Spring Boot 3.4.5 + Java 21 |
 | データベース | PostgreSQL 16 |
+| DBアクセス | MyBatis（mybatis-spring-boot-starter 3.0.3） |
 | 認証 | JWT（jjwt 0.12.6）+ BCrypt |
 | 画像ストレージ | AWS S3 |
 | ローカル開発環境 | Docker / docker-compose |

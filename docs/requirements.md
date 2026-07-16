@@ -48,7 +48,7 @@ X(Twitter)のタイムライン形式のSNSアプリを学習目的で作成す�
 | # | 機能 | 概要 | 詳細ドキュメント |
 |---|------|------|------|
 | 1 | ログイン機能 | メールアドレス＋パスワードによる新規登録・ログイン・ログアウト（JWT認証） | [features/01_login.md](./features/01_login.md) |
-| 2 | タイムライン機能 | 全ユーザーの投稿を新着順に表示、画像添付投稿・削除 | [features/02_timeline.md](./features/02_timeline.md) |
+| 2 | タイムライン機能 | 全ユーザーの投稿を新着順に表示、画像添付投稿・編集・削除 | [features/02_timeline.md](./features/02_timeline.md) |
 | 3 | コメント機能 | 投稿への第三者コメント、コメント数の表示 | [features/03_comment.md](./features/03_comment.md) |
 | 4 | いいね機能 | 第三者を含む任意ユーザーによるいいね、いいね数の表示 | [features/04_like.md](./features/04_like.md) |
 | 5 | 画像投稿機能 | 投稿への画像添付（S3保存） | [features/05_image_post.md](./features/05_image_post.md) |
@@ -132,6 +132,7 @@ flowchart LR
   U --> A0[新規登録する]
   U --> A1[ログイン / ログアウトする]
   U --> B[投稿する（画像添付可）]
+  U --> B2[投稿を編集する]
   U --> C[投稿を削除する]
   U --> D[投稿にコメントする]
   U --> E[投稿にいいねする / 取り消す]
