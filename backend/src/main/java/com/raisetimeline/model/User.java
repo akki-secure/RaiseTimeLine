@@ -1,39 +1,18 @@
 package com.raisetimeline.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-
-    @Column(nullable = false, unique = true, length = 50)
     private String username;
-
-    @Column(name = "display_name", nullable = false, length = 50)
     private String displayName;
-
-    @Column(length = 160)
     private String bio;
-
-    @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

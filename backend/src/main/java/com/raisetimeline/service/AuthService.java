@@ -3,8 +3,8 @@ package com.raisetimeline.service;
 import com.raisetimeline.dto.AuthResponse;
 import com.raisetimeline.dto.LoginRequest;
 import com.raisetimeline.dto.RegisterRequest;
+import com.raisetimeline.mapper.UserMapper;
 import com.raisetimeline.model.User;
-import com.raisetimeline.repository.UserRepository;
 import com.raisetimeline.security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,12 @@ public class AuthService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
 
-    private final UserRepository userRepo;
+    private final UserMapper userMapper;
     private final BCryptPasswordEncoder encoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepo, BCryptPasswordEncoder encoder, JwtUtil jwtUtil) {
-        this.userRepo = userRepo;
+    public AuthService(UserMapper userMapper, BCryptPasswordEncoder encoder, JwtUtil jwtUtil) {
+        this.userMapper = userMapper;
         this.encoder = encoder;
         this.jwtUtil = jwtUtil;
     }
@@ -45,9 +45,9 @@ public class AuthService {
         if (displayName == null || displayName.isBlank() || displayName.length() > 50)
             throw new RuntimeException("表示名は1〜50文字で入力してください");
 
-        if (userRepo.existsByEmail(email))
+        if (userMapper.existsByEmail(email))
             throw new RuntimeException("このメールアドレスはすでに登録されています");
-        if (userRepo.existsByUsername(username))
+        if (userMapper.existsByUsername(username))
             throw new RuntimeException("このユーザー名はすでに使用されています");
 
         User user = new User();
@@ -55,7 +55,7 @@ public class AuthService {
         user.setPasswordHash(encoder.encode(password));
         user.setUsername(username);
         user.setDisplayName(displayName);
-        userRepo.save(user);
+        userMapper.insert(user);
 
         String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         return new AuthResponse(token, user.getId(), user.getUsername(), user.getDisplayName(), user.getEmail());
@@ -68,7 +68,7 @@ public class AuthService {
         if (email == null || email.isBlank() || password == null || password.isBlank())
             throw new RuntimeException("メールアドレスまたはパスワードが正しくありません");
 
-        Optional<User> userOpt = userRepo.findByEmail(email);
+        Optional<User> userOpt = userMapper.findByEmail(email);
         User user = userOpt.orElseThrow(() -> new RuntimeException("メールアドレスまたはパスワードが正しくありません"));
 
         if (!encoder.matches(password, user.getPasswordHash()))
