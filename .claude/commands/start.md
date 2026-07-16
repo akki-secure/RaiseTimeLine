@@ -4,7 +4,7 @@ description: RaiseTimeLineプロジェクトのDB・バックエンド・フロ�
 
 以下の手順でRaiseTimeLineプロジェクトのサーバーをすべて起動してください。各ステップを順番に実行し、起動を確認してから次へ進んでください。
 
-> **注意**: このスキルは `backend` / `frontend` / `docker-compose.yml` の実装が完了していることを前提にしています。設計フェーズ（`docs/`のみが存在する状態）ではまだ利用できません。
+> **現在の実装範囲**: ユーザー登録・ログイン（認証・認可）のみ実装済み。ログイン後の画面は本実装のタイムラインではなく "Hello World!" の仮画面です。
 
 ## Step 1: データベース（PostgreSQL）を起動
 
@@ -32,7 +32,13 @@ cd backend && JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew bootRun > /tmp
 until grep -q "Started RaiseTimeLineApplication" /tmp/backend.log 2>/dev/null; do sleep 2; done && echo "Backend ready"
 ```
 
-ポートは **8080** です。
+ポートは **8080** です。API疎通確認は以下で行えます（ログイン成功時は200、失敗時は400が返ればOK）:
+
+```bash
+curl -i -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"nonexistent@example.com","password":"dummy1234"}'
+```
 
 ## Step 3: フロントエンド（React + Vite）を起動
 
@@ -54,9 +60,9 @@ until grep -q "Local:" /tmp/frontend.log 2>/dev/null; do sleep 1; done && echo "
 
 | サービス | URL | 状態 |
 |---|---|---|
-| フロントエンド（タイムライン画面） | http://localhost:5173 | ✅ 起動済み |
-| バックエンドAPI | http://localhost:8080/api/posts | ✅ 起動済み |
-| DB（PostgreSQL） | localhost:5432 | ✅ 起動済み |
+| フロントエンド（ログイン後は"Hello World!"仮画面） | http://localhost:5173 | ✅ 起動済み |
+| バックエンドAPI | http://localhost:8080/api/auth/login | ✅ 起動済み |
+| DB（PostgreSQL） | localhost:5433（ホスト側。ローカルにネイティブPostgreSQLが5432を使用しているため5433にマッピング） | ✅ 起動済み |
 
 ## サービス停止手順
 
