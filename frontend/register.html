@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaiseTimeLine - 新規登録</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>RaiseTimeLine 新規登録</h1>
+    <form id="register-form">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" required autocomplete="username">
+
+      <label for="password">パスワード</label>
+      <input type="password" id="password" required autocomplete="new-password" minlength="8">
+
+      <label for="username">ユーザー名（@handle）</label>
+      <input type="text" id="username" required autocomplete="off" pattern="[a-zA-Z0-9_]{3,20}">
+
+      <label for="displayName">表示名</label>
+      <input type="text" id="displayName" required autocomplete="off" maxlength="50">
+
+      <button type="submit" id="submit-btn">登録する</button>
+    </form>
+    <div id="message"></div>
+    <div class="footer-link">
+      すでにアカウントをお持ちの方は
+      <a href="login.html">ログイン</a>
+    </div>
+  </div>
+
+<script src="auth.js"></script>
+<script>
+  const form = document.getElementById("register-form");
+  const messageEl = document.getElementById("message");
+  const submitBtn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    messageEl.className = "";
+    messageEl.textContent = "";
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value;
+    const displayName = document.getElementById("displayName").value;
+
+    try {
+      await register(email, password, username, displayName);
+      window.location.href = "timeline.html";
+    } catch (err) {
+      messageEl.className = "error";
+      messageEl.textContent = err.message || "登録に失敗しました";
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
