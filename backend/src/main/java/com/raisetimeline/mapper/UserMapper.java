@@ -16,6 +16,10 @@ public interface UserMapper {
             "FROM users WHERE email = #{email}")
     Optional<User> findByEmail(@Param("email") String email);
 
+    @Select("SELECT id, email, password_hash, username, display_name, bio, avatar_url, created_at, updated_at " +
+            "FROM users WHERE id = #{id}")
+    Optional<User> findById(@Param("id") Long id);
+
     @Select("SELECT EXISTS(SELECT 1 FROM users WHERE email = #{email})")
     boolean existsByEmail(@Param("email") String email);
 
