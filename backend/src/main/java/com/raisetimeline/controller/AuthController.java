@@ -2,6 +2,7 @@ package com.raisetimeline.controller;
 
 import com.raisetimeline.dto.AuthResponse;
 import com.raisetimeline.dto.LoginRequest;
+import com.raisetimeline.dto.RefreshTokenRequest;
 import com.raisetimeline.dto.RegisterRequest;
 import com.raisetimeline.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +26,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
         return ResponseEntity.ok(authService.login(req));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest req) {
+        return ResponseEntity.ok(authService.refresh(req));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequest req) {
+        authService.logout(req);
+        return ResponseEntity.noContent().build();
     }
 }

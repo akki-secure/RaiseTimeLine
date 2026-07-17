@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaiseTimeLine - タイムライン</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Hello World!</h1>
+    <p id="welcome" style="text-align: center; color: #657786;"></p>
+    <p style="text-align: center; color: #657786; font-size: 13px;">
+      タイムライン機能は未実装です。これはログイン確認用の仮画面です。
+    </p>
+    <button id="logout-btn">ログアウト</button>
+  </div>
+
+<script src="auth.js"></script>
+<script>
+  if (requireAuth()) {
+    document.getElementById("welcome").textContent =
+      `ようこそ、${getDisplayName() || "ゲスト"}さん`;
+
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      await logout();
+      window.location.href = "login.html";
+    });
+  }
+</script>
+</body>
+</html>

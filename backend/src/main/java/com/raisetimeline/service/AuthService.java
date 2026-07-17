@@ -2,14 +2,19 @@ package com.raisetimeline.service;
 
 import com.raisetimeline.dto.AuthResponse;
 import com.raisetimeline.dto.LoginRequest;
+import com.raisetimeline.dto.RefreshTokenRequest;
 import com.raisetimeline.dto.RegisterRequest;
+import com.raisetimeline.mapper.RefreshTokenMapper;
 import com.raisetimeline.mapper.UserMapper;
+import com.raisetimeline.model.RefreshToken;
 import com.raisetimeline.model.User;
 import com.raisetimeline.security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -21,11 +26,14 @@ public class AuthService {
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
 
     private final UserMapper userMapper;
+    private final RefreshTokenMapper refreshTokenMapper;
     private final BCryptPasswordEncoder encoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(UserMapper userMapper, BCryptPasswordEncoder encoder, JwtUtil jwtUtil) {
+    public AuthService(UserMapper userMapper, RefreshTokenMapper refreshTokenMapper,
+                        BCryptPasswordEncoder encoder, JwtUtil jwtUtil) {
         this.userMapper = userMapper;
+        this.refreshTokenMapper = refreshTokenMapper;
         this.encoder = encoder;
         this.jwtUtil = jwtUtil;
     }
@@ -57,8 +65,7 @@ public class AuthService {
         user.setDisplayName(displayName);
         userMapper.insert(user);
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getDisplayName(), user.getEmail());
+        return issueTokens(user);
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -74,7 +81,43 @@ public class AuthService {
         if (!encoder.matches(password, user.getPasswordHash()))
             throw new RuntimeException("メールアドレスまたはパスワードが正しくありません");
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getDisplayName(), user.getEmail());
+        return issueTokens(user);
+    }
+
+    public AuthResponse refresh(RefreshTokenRequest req) {
+        String rawToken = req.getRefreshToken();
+        if (rawToken == null || rawToken.isBlank())
+            throw new RuntimeException("リフレッシュトークンが不正です");
+
+        String hash = jwtUtil.hashToken(rawToken);
+        RefreshToken stored = refreshTokenMapper.revokeIfValid(hash)
+                .orElseThrow(() -> new RuntimeException("リフレッシュトークンが無効です"));
+
+        User user = userMapper.findById(stored.getUserId())
+                .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+
+        return issueTokens(user);
+    }
+
+    public void logout(RefreshTokenRequest req) {
+        String rawToken = req.getRefreshToken();
+        if (rawToken == null || rawToken.isBlank())
+            return;
+        String hash = jwtUtil.hashToken(rawToken);
+        refreshTokenMapper.revokeByTokenHash(hash);
+    }
+
+    private AuthResponse issueTokens(User user) {
+        String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername());
+
+        String rawRefreshToken = jwtUtil.generateRefreshToken();
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUserId(user.getId());
+        refreshToken.setTokenHash(jwtUtil.hashToken(rawRefreshToken));
+        refreshToken.setExpiresAt(LocalDateTime.now().plus(Duration.ofMillis(jwtUtil.getRefreshExpirationMs())));
+        refreshTokenMapper.insert(refreshToken);
+
+        return new AuthResponse(accessToken, rawRefreshToken, user.getId(), user.getUsername(),
+                user.getDisplayName(), user.getEmail());
     }
 }

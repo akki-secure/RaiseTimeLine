@@ -21,6 +21,7 @@ erDiagram
   USERS ||--o{ LIKES : "いいねする"
   USERS ||--o{ FOLLOWS : "フォローする(follower_id)"
   USERS ||--o{ FOLLOWS : "フォローされる(followed_id)"
+  USERS ||--o{ REFRESH_TOKENS : "発行する"
   POSTS ||--o{ COMMENTS : "持つ"
   POSTS ||--o{ LIKES : "持つ"
 
@@ -60,6 +61,14 @@ erDiagram
     bigint id PK
     bigint follower_id FK
     bigint followed_id FK
+    timestamp created_at
+  }
+  REFRESH_TOKENS {
+    bigint id PK
+    bigint user_id FK
+    varchar token_hash UK
+    timestamp expires_at
+    timestamp revoked_at
     timestamp created_at
   }
 ```
@@ -126,6 +135,20 @@ erDiagram
 - `UNIQUE (follower_id, followed_id)` 制約により、同一ユーザーへの二重フォローを防止する
 - `follower_id <> followed_id` をアプリ側（またはCHECK制約）で保証し、自分自身のフォローを防止する
 - 相互フォロー（フォローバック）は `follows` テーブルに2レコード存在する状態として表現する（例: A→B と B→A）
+
+### refresh_tokens（リフレッシュトークン）
+
+| カラム名 | 型 | 制約 | 説明 |
+|---|---|---|---|
+| id | bigint | PK, auto increment | リフレッシュトークンID |
+| user_id | bigint | FK → users.id, NOT NULL | 発行対象のユーザー |
+| token_hash | varchar(64) | UNIQUE, NOT NULL | リフレッシュトークンのSHA-256ハッシュ値（生の値は保存しない） |
+| expires_at | timestamp | NOT NULL | 有効期限（発行から7日） |
+| revoked_at | timestamp | NULL可 | 失効日時（NULLの場合は有効。ログアウトまたはリフレッシュ時のローテーションでセットされる） |
+| created_at | timestamp | NOT NULL, default now() | 発行日時 |
+
+- ユーザー削除時は `ON DELETE CASCADE` で関連するリフレッシュトークンも削除される
+- リフレッシュ時は使用済みトークンを失効させた上で新しいトークンを発行する（ローテーション、使い捨て）
 
 ---
 
