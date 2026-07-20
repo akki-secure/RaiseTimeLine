@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class AuthService {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[^\\s\\u3000\\p{Cntrl}]{3,20}$");
 
     private final UserMapper userMapper;
     private final RefreshTokenMapper refreshTokenMapper;
@@ -49,7 +49,7 @@ public class AuthService {
         if (password == null || password.length() < 8)
             throw new RuntimeException("パスワードは8文字以上で入力してください");
         if (username == null || !USERNAME_PATTERN.matcher(username).matches())
-            throw new RuntimeException("ユーザー名は英数字と_のみ、3〜20文字で入力してください");
+            throw new RuntimeException("ユーザー名は空白を含まない3〜20文字で入力してください");
         if (displayName == null || displayName.isBlank() || displayName.length() > 50)
             throw new RuntimeException("表示名は1〜50文字で入力してください");
 
