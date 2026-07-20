@@ -5,28 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RaiseTimeLine - タイムライン</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="timeline.css">
 </head>
 <body>
-  <div class="card">
-    <h1>Hello World!</h1>
-    <p id="welcome" style="text-align: center; color: #657786;"></p>
-    <p style="text-align: center; color: #657786; font-size: 13px;">
-      タイムライン機能は未実装です。これはログイン確認用の仮画面です。
-    </p>
-    <button id="logout-btn">ログアウト</button>
+  <div class="timeline-page">
+    <header class="app-header">
+      <span class="app-title">🐦 RaiseTimeLine</span>
+      <div class="header-right">
+        <span id="header-username"></span>
+        <button id="logout-btn">ログアウト</button>
+      </div>
+    </header>
+
+    <section class="post-form card">
+      <textarea id="post-body" maxlength="280" placeholder="いまどうしてる？" rows="3"></textarea>
+      <div class="post-form-footer">
+        <span id="char-count">0/280</span>
+        <button id="post-submit-btn">投稿</button>
+      </div>
+      <div id="post-form-message"></div>
+    </section>
+
+    <section id="post-list" class="post-list"></section>
+    <div id="scroll-sentinel"></div>
+  </div>
+
+  <div id="new-posts-modal" class="modal-overlay hidden">
+    <div class="modal-card card">
+      <p id="new-posts-message"></p>
+      <div class="modal-actions">
+        <button id="new-posts-load-btn">表示する</button>
+        <button id="new-posts-dismiss-btn" class="secondary">閉じる</button>
+      </div>
+    </div>
   </div>
 
 <script src="auth.js"></script>
-<script>
-  if (requireAuth()) {
-    document.getElementById("welcome").textContent =
-      `ようこそ、${getDisplayName() || "ゲスト"}さん`;
-
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-      await logout();
-      window.location.href = "login.html";
-    });
-  }
-</script>
+<script src="posts.js"></script>
+<script src="timeline.js"></script>
 </body>
 </html>

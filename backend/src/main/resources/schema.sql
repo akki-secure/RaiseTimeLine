@@ -26,3 +26,14 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token_hash ON refresh_tokens(token_hash);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+
+CREATE TABLE IF NOT EXISTS posts (
+    id          BIGSERIAL    PRIMARY KEY,
+    user_id     BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body        TEXT         NOT NULL,
+    created_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
