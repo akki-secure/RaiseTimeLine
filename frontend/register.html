@@ -17,7 +17,7 @@
       <input type="password" id="password" required autocomplete="new-password" minlength="8">
 
       <label for="username">ユーザー名（@handle）</label>
-      <input type="text" id="username" required autocomplete="off" pattern="[a-zA-Z0-9_]{3,20}">
+      <input type="text" id="username" required autocomplete="off" pattern="[^\s\x00-\x1f\x7f]{3,20}">
 
       <label for="displayName">表示名</label>
       <input type="text" id="displayName" required autocomplete="off" maxlength="50">
