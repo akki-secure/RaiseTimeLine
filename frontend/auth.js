@@ -6,12 +6,14 @@ function saveTokens(data) {
   localStorage.setItem("token", data.token);
   localStorage.setItem("refreshToken", data.refreshToken);
   localStorage.setItem("displayName", data.displayName || data.username || "");
+  localStorage.setItem("username", data.username || "");
 }
 
 function clearTokens() {
   localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("displayName");
+  localStorage.removeItem("username");
 }
 
 function getAccessToken() {
@@ -24,6 +26,10 @@ function getRefreshToken() {
 
 function getDisplayName() {
   return localStorage.getItem("displayName");
+}
+
+function getUsername() {
+  return localStorage.getItem("username");
 }
 
 // ログイン必須ページの先頭で呼ぶ。未ログインならlogin.htmlへ追い返してfalseを返す。

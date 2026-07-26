@@ -16,6 +16,7 @@ frontend/.env.local
 backend/build/
 backend/.gradle/
 backend/out/
+backend/uploads/
 
 # Claude Code local settings
 .claude/settings.local.json

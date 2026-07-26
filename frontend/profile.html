@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaiseTimeLine - プロフィール</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="timeline.css">
+<link rel="stylesheet" href="profile.css">
+</head>
+<body>
+  <div class="timeline-page">
+    <header class="app-header">
+      <a class="app-title" href="timeline.html">🐦 RaiseTimeLine</a>
+      <div class="header-right">
+        <button id="logout-btn">ログアウト</button>
+      </div>
+    </header>
+
+    <section id="profile-card" class="profile-card card hidden">
+      <span class="profile-avatar">🧑</span>
+      <div class="profile-info">
+        <div class="profile-name-row">
+          <span id="profile-display-name" class="profile-display-name"></span>
+          <button id="profile-edit-bio-btn" class="secondary hidden">自己紹介を編集</button>
+        </div>
+        <span id="profile-username" class="profile-username"></span>
+        <div id="profile-bio-view" class="profile-bio"></div>
+      </div>
+    </section>
+    <div id="profile-message"></div>
+
+    <section id="post-list" class="post-list"></section>
+    <div id="load-more-wrap">
+      <button id="load-more-btn" class="secondary hidden">もっと見る</button>
+    </div>
+  </div>
+
+<script src="auth.js"></script>
+<script src="posts.js"></script>
+<script src="users.js"></script>
+<script src="comments.js"></script>
+<script src="likes.js"></script>
+<script src="post-ui.js"></script>
+<script src="profile.js"></script>
+</body>
+</html>

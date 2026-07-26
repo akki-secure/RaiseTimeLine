@@ -10,6 +10,7 @@ public class PostResponse {
     private final String username;
     private final String displayName;
     private final String body;
+    private final String imageUrl;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final boolean edited;
@@ -23,6 +24,7 @@ public class PostResponse {
         this.username = post.getAuthorUsername();
         this.displayName = post.getAuthorDisplayName();
         this.body = post.getBody();
+        this.imageUrl = post.getImageUrl();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.edited = !post.getUpdatedAt().equals(post.getCreatedAt());
@@ -36,6 +38,7 @@ public class PostResponse {
     public String getUsername() { return username; }
     public String getDisplayName() { return displayName; }
     public String getBody() { return body; }
+    public String getImageUrl() { return imageUrl; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public boolean isEdited() { return edited; }

@@ -9,6 +9,7 @@ import com.raisetimeline.model.Post;
 import com.raisetimeline.model.PostWithAuthor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +23,11 @@ public class PostService {
     private static final int MAX_PAGE_SIZE = 50;
 
     private final PostMapper postMapper;
+    private final ImageStorageService imageStorageService;
 
-    public PostService(PostMapper postMapper) {
+    public PostService(PostMapper postMapper, ImageStorageService imageStorageService) {
         this.postMapper = postMapper;
+        this.imageStorageService = imageStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -42,17 +45,27 @@ public class PostService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<PostResponse> listPageByUserId(Long currentUserId, Long targetUserId, Long beforeId, Integer limit) {
+        int clampedLimit = clampLimit(limit);
+        return postMapper.findPageByUserId(targetUserId, beforeId, clampedLimit, currentUserId).stream()
+                .map(p -> new PostResponse(p, p.getUserId().equals(currentUserId)))
+                .toList();
+    }
+
     private int clampLimit(Integer limit) {
         if (limit == null) return DEFAULT_PAGE_SIZE;
         return Math.max(1, Math.min(limit, MAX_PAGE_SIZE));
     }
 
-    public PostResponse create(Long currentUserId, PostRequest req) {
-        String body = validateBody(req.getBody());
+    public PostResponse create(Long currentUserId, String rawBody, MultipartFile image) {
+        String body = validateBody(rawBody);
+        String imageUrl = (image != null && !image.isEmpty()) ? imageStorageService.store(image) : null;
 
         Post post = new Post();
         post.setUserId(currentUserId);
         post.setBody(body);
+        post.setImageUrl(imageUrl);
         LocalDateTime now = LocalDateTime.now();
         post.setCreatedAt(now);
         post.setUpdatedAt(now);

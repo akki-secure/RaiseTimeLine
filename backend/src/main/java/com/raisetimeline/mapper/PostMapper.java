@@ -14,6 +14,9 @@ public interface PostMapper {
     List<PostWithAuthor> findPage(@Param("beforeId") Long beforeId, @Param("limit") int limit,
                                    @Param("currentUserId") Long currentUserId);
 
+    List<PostWithAuthor> findPageByUserId(@Param("userId") Long userId, @Param("beforeId") Long beforeId,
+                                           @Param("limit") int limit, @Param("currentUserId") Long currentUserId);
+
     List<PostWithAuthor> findNewerThan(@Param("afterId") Long afterId, @Param("currentUserId") Long currentUserId);
 
     Optional<PostWithAuthor> findById(@Param("id") Long id, @Param("currentUserId") Long currentUserId);

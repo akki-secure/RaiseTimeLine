@@ -12,12 +12,15 @@ async function fetchPosts({ beforeId, afterId, limit } = {}) {
   return res.json();
 }
 
-async function createPost(body) {
-  const res = await authFetch("/api/posts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ body }),
-  });
+async function createPost(body, imageFile) {
+  const formData = new FormData();
+  formData.set("body", body);
+  if (imageFile) formData.set("image", imageFile);
+
+  // Content-Typeヘッダーは明示的に指定しない。FormDataをbodyに渡すとfetchが
+  // 境界(boundary)付きのmultipart/form-dataを自動設定するため、手動指定すると
+  // 境界情報が欠落しリクエストが壊れる。
+  const res = await authFetch("/api/posts", { method: "POST", body: formData });
   if (!res.ok) throw new Error(await extractErrorMessage(res, "投稿に失敗しました"));
   return res.json();
 }
