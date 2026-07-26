@@ -4,11 +4,12 @@ import com.raisetimeline.exception.InvalidImageException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,11 +33,17 @@ public class ImageStorageService {
             "webp", "webp"
     );
 
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    private final S3Client s3Client;
 
-    @Value("${app.upload.public-path}")
-    private String publicPath;
+    @Value("${app.s3.bucket-name}")
+    private String bucketName;
+
+    @Value("${app.s3.region}")
+    private String region;
+
+    public ImageStorageService(S3Client s3Client) {
+        this.s3Client = s3Client;
+    }
 
     public String store(MultipartFile file) {
         if (file == null || file.isEmpty())
@@ -55,22 +62,20 @@ public class ImageStorageService {
         if (originalExt == null || !ext.equals(EXTENSION_ALIASES.get(originalExt)))
             throw new InvalidImageException("ファイル拡張子と形式が一致しません");
 
+        // オブジェクトキーはUUIDで生成し、ユーザー入力(originalFilename)を一切キー組み立てに
+        // 使わないことでパストラバーサル・キー衝突を構造的に排除する。
+        String key = UUID.randomUUID() + "." + ext;
+
         try {
-            Path dir = Paths.get(uploadDir).toAbsolutePath().normalize();
-            Files.createDirectories(dir);
-
-            // 保存ファイル名はUUIDで生成し、ユーザー入力(originalFilename)を一切パス組み立てに
-            // 使わないことでパストラバーサル（例: "../../etc/passwd"）を構造的に排除する。
-            String filename = UUID.randomUUID() + "." + ext;
-            Path target = dir.resolve(filename).normalize();
-
-            // UUID生成のため理論上到達しないが、意図を明示するための多層防御チェック。
-            if (!target.getParent().equals(dir))
-                throw new InvalidImageException("不正なファイル名です");
-
-            file.transferTo(target.toFile());
-            return publicPath + "/" + filename;
-        } catch (IOException e) {
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .contentType(contentType)
+                    .contentLength(file.getSize())
+                    .build();
+            s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
+        } catch (IOException | S3Exception e) {
             throw new RuntimeException("画像の保存に失敗しました", e);
         }
     }

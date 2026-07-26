@@ -45,7 +45,7 @@ function buildPostElement(post) {
   if (post.imageUrl) {
     const img = document.createElement("img");
     img.className = "post-image";
-    img.src = `${API_BASE}${post.imageUrl}`;
+    img.src = post.imageUrl;
     img.alt = "添付画像";
     div.appendChild(img);
   }
