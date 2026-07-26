@@ -100,6 +100,14 @@ http://localhost:5173
 
 > バックエンドの接続設定は `backend/src/main/resources/application.properties` で変更する想定です。
 
+## テスト用ユーザー
+
+機能追加時の動作確認で、新規登録ユーザーだけでなく既存ユーザーでもログインして確認できるよう、直近の動作確認で作成したユーザーを記録しています。
+
+| ユーザー名 | メールアドレス | 表示名 | パスワード |
+|---|---|---|---|
+| mybatis_test | mybatis_test@example.com | MyBatisテスト | TestPass1234 |
+
 ## Claude Code スキル
 
 このプロジェクトには Claude Code 用のカスタムスキルが含まれています。

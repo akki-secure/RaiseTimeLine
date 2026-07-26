@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raisetimeline.mapper.CommentMapper">
+
+    <sql id="selectColumns">
+        c.id, c.post_id, c.user_id, c.body, c.created_at, c.updated_at,
+        u.username AS author_username, u.display_name AS author_display_name
+    </sql>
+
+    <select id="findByPostId" resultType="com.raisetimeline.model.CommentWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        FROM comments c JOIN users u ON u.id = c.user_id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.id ASC
+    </select>
+
+    <select id="findById" resultType="com.raisetimeline.model.CommentWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        FROM comments c JOIN users u ON u.id = c.user_id
+        WHERE c.id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments (post_id, user_id, body, created_at, updated_at)
+        VALUES (#{postId}, #{userId}, #{body}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!--
+        所有権チェックと更新をアトミックに行う（PostMapper.updateIfOwnerと同じ設計）。
+        post_idも条件に含め、URLパスのpostIdとコメントの実際の親投稿が一致することも保証する。
+        RETURNINGで結果を受け取るためMyBatis上は<update>ではなく<select>として扱う。
+    -->
+    <select id="updateIfOwner" resultType="com.raisetimeline.model.Comment">
+        UPDATE comments SET body = #{body}, updated_at = NOW()
+        WHERE id = #{id} AND post_id = #{postId} AND user_id = #{userId}
+        RETURNING id, post_id, user_id, body, created_at, updated_at
+    </select>
+
+    <delete id="deleteIfOwner">
+        DELETE FROM comments WHERE id = #{id} AND post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <select id="existsByIdAndPostId" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM comments WHERE id = #{id} AND post_id = #{postId})
+    </select>
+
+</mapper>
