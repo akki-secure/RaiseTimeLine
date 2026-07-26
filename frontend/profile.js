@@ -17,6 +17,11 @@ if (requireAuth()) {
   const usernameEl = document.getElementById("profile-username");
   const bioViewEl = document.getElementById("profile-bio-view");
   const editBioBtn = document.getElementById("profile-edit-bio-btn");
+  const followBtn = document.getElementById("profile-follow-btn");
+  const followingCountEl = document.getElementById("profile-following-count");
+  const followersCountEl = document.getElementById("profile-followers-count");
+  const followingLinkEl = document.getElementById("profile-following-link");
+  const followersLinkEl = document.getElementById("profile-followers-link");
   const listEl = document.getElementById("post-list");
   const loadMoreBtn = document.getElementById("load-more-btn");
 
@@ -47,13 +52,33 @@ if (requireAuth()) {
     displayNameEl.textContent = profile.displayName;
     usernameEl.textContent = `@${profile.username}`;
     renderBioView(profile.bio);
+    followingCountEl.textContent = profile.followingCount;
+    followersCountEl.textContent = profile.followerCount;
+    followingLinkEl.href = `follow-list.html?username=${encodeURIComponent(profile.username)}&type=following`;
+    followersLinkEl.href = `follow-list.html?username=${encodeURIComponent(profile.username)}&type=followers`;
 
     if (profile.username === getUsername()) {
       editBioBtn.classList.remove("hidden");
       editBioBtn.onclick = () => enterBioEditMode(profile.bio);
+      followBtn.classList.add("hidden");
+      followBtn.onclick = null;
     } else {
       editBioBtn.classList.add("hidden");
       editBioBtn.onclick = null;
+      followBtn.classList.remove("hidden");
+      setFollowButtonState(followBtn, profile.followedByMe);
+      followBtn.onclick = async () => {
+        followBtn.disabled = true;
+        try {
+          const result = await toggleFollow(profile.username);
+          setFollowButtonState(followBtn, result.followed);
+          followersCountEl.textContent = result.followerCount;
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          followBtn.disabled = false;
+        }
+      };
     }
   }
 

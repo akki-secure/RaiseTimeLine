@@ -23,8 +23,13 @@
         <div class="profile-name-row">
           <span id="profile-display-name" class="profile-display-name"></span>
           <button id="profile-edit-bio-btn" class="secondary hidden">自己紹介を編集</button>
+          <button id="profile-follow-btn" class="hidden"></button>
         </div>
         <span id="profile-username" class="profile-username"></span>
+        <div class="profile-stats">
+          <a id="profile-following-link" href="#" class="profile-stat"><span id="profile-following-count">0</span> フォロー中</a>
+          <a id="profile-followers-link" href="#" class="profile-stat"><span id="profile-followers-count">0</span> フォロワー</a>
+        </div>
         <div id="profile-bio-view" class="profile-bio"></div>
       </div>
     </section>
@@ -41,6 +46,7 @@
 <script src="users.js"></script>
 <script src="comments.js"></script>
 <script src="likes.js"></script>
+<script src="user-ui.js"></script>
 <script src="post-ui.js"></script>
 <script src="profile.js"></script>
 </body>

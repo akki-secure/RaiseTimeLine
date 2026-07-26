@@ -62,6 +62,18 @@ CREATE TABLE IF NOT EXISTS likes (
 CREATE INDEX IF NOT EXISTS idx_likes_post_id ON likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_likes_user_id ON likes(user_id);
 
+CREATE TABLE IF NOT EXISTS follows (
+    id           BIGSERIAL   PRIMARY KEY,
+    follower_id  BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    followee_id  BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
+    UNIQUE (follower_id, followee_id),
+    CHECK (follower_id <> followee_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON follows(follower_id);
+CREATE INDEX IF NOT EXISTS idx_follows_followee_id ON follows(followee_id);
+
 -- =====================================================
 -- 既存DBへのカラム追加（新規インストール時は上記CREATE TABLEで既に含まれるため冪等）
 -- =====================================================

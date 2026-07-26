@@ -28,6 +28,8 @@ if (requireAuth()) {
   const modalMessageEl = document.getElementById("new-posts-message");
   const modalLoadBtn = document.getElementById("new-posts-load-btn");
   const modalDismissBtn = document.getElementById("new-posts-dismiss-btn");
+  const suggestionsSection = document.getElementById("suggestions-section");
+  const suggestionsList = document.getElementById("suggestions-list");
 
   let oldestLoadedId = null;
   let newestLoadedId = null;
@@ -133,17 +135,9 @@ if (requireAuth()) {
   }
 
   function buildUserSearchResultElement(user) {
-    const a = document.createElement("a");
-    a.className = "user-search-result-item";
-    a.href = `profile.html?username=${encodeURIComponent(user.username)}`;
-    const name = document.createElement("span");
-    name.className = "result-display-name";
-    name.textContent = user.displayName;
-    const username = document.createElement("span");
-    username.className = "result-username";
-    username.textContent = `@${user.username}`;
-    a.append(name, username);
-    return a;
+    const row = buildUserRowElement(user);
+    row.classList.add("user-search-result-item");
+    return row;
   }
 
   const scrollObserver = new IntersectionObserver((entries) => {
@@ -170,6 +164,19 @@ if (requireAuth()) {
   window.addEventListener("beforeunload", () => clearInterval(pollTimer));
 
   loadInitialPosts();
+  loadSuggestions();
+
+  async function loadSuggestions() {
+    try {
+      const users = await fetchSuggestions();
+      if (users.length === 0) return;
+      suggestionsList.innerHTML = "";
+      users.forEach((u) => suggestionsList.appendChild(buildUserRowElement(u)));
+      suggestionsSection.classList.remove("hidden");
+    } catch (err) {
+      // おすすめユーザーの取得失敗はタイムライン表示自体を妨げないよう無視する
+    }
+  }
 
   async function loadInitialPosts() {
     try {

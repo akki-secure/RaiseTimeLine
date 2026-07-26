@@ -4,7 +4,7 @@ description: RaiseTimeLineプロジェクトのDB・バックエンド・フロ�
 
 以下の手順でRaiseTimeLineプロジェクトのサーバーをすべて起動してください。各ステップを順番に実行し、起動を確認してから次へ進んでください。
 
-> **現在の実装範囲**: ユーザー登録・ログイン（認証・認可）のみ実装済み。ログイン後の画面は本実装のタイムラインではなく "Hello World!" の仮画面です。
+> **実装範囲**: 認証（登録・ログイン）、タイムライン（投稿・画像添付・いいね・コメント）、ユーザー検索、プロフィール（自己紹介編集）、フォロー/フォロワー機能が実装済みです。フロントエンドはReact/Viteではなく、ビルド不要の素のHTML/CSS/バニラJavaScript（`frontend/`配下）です。
 
 ## Step 1: データベース（PostgreSQL）を起動
 
@@ -40,18 +40,20 @@ curl -i -X POST http://localhost:8080/api/auth/login \
   -d '{"email":"nonexistent@example.com","password":"dummy1234"}'
 ```
 
-## Step 3: フロントエンド（React + Vite）を起動
+## Step 3: フロントエンド（静的ファイル）を起動
+
+`frontend/`配下はビルド不要の素のHTML/CSS/JavaScriptなので、Python標準の`http.server`で配信します（Node.js/npmは不要です）。
 
 以下のコマンドをバックグラウンドで実行してください:
 
 ```bash
-cd frontend && npm run dev > /tmp/frontend.log 2>&1 &
+cd frontend && python3 -m http.server 5500 > /tmp/frontend.log 2>&1 &
 ```
 
-ログを確認し、`Local: http://localhost:5173` が出力されたら起動完了です:
+疎通確認:
 
 ```bash
-until grep -q "Local:" /tmp/frontend.log 2>/dev/null; do sleep 1; done && echo "Frontend ready"
+until lsof -ti :5500 >/dev/null 2>&1; do sleep 1; done && echo "Frontend ready"
 ```
 
 ## 完了報告
@@ -60,8 +62,8 @@ until grep -q "Local:" /tmp/frontend.log 2>/dev/null; do sleep 1; done && echo "
 
 | サービス | URL | 状態 |
 |---|---|---|
-| フロントエンド（ログイン後は"Hello World!"仮画面） | http://localhost:5173 | ✅ 起動済み |
-| バックエンドAPI | http://localhost:8080/api/auth/login | ✅ 起動済み |
+| フロントエンド（ログイン画面） | http://localhost:5500/login.html | ✅ 起動済み |
+| バックエンドAPI | http://localhost:8080/api/posts | ✅ 起動済み |
 | DB（PostgreSQL） | localhost:5433（ホスト側。ローカルにネイティブPostgreSQLが5432を使用しているため5433にマッピング） | ✅ 起動済み |
 
 ## サービス停止手順
@@ -69,7 +71,7 @@ until grep -q "Local:" /tmp/frontend.log 2>/dev/null; do sleep 1; done && echo "
 各サービスを停止する場合:
 
 ```bash
-lsof -ti :5173
+lsof -ti :5500
 lsof -ti :8080
 docker compose down
 ```

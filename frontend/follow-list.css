@@ -1,0 +1,33 @@
+.follow-list-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #14171a;
+  margin: 0 0 16px;
+}
+
+.follow-list {
+  padding: 0;
+}
+.follow-list .user-row {
+  border-bottom: 1px solid #f0f3f4;
+}
+.follow-list .user-row:last-child {
+  border-bottom: none;
+}
+
+.follow-list-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: #657786;
+  font-size: 14px;
+}
+
+#follow-list-message.error {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fdecea;
+  color: #c62828;
+  border: 1px solid #f5b5b5;
+  margin-bottom: 16px;
+}

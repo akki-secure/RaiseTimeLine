@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaiseTimeLine - フォロー一覧</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="timeline.css">
+<link rel="stylesheet" href="profile.css">
+<link rel="stylesheet" href="follow-list.css">
+</head>
+<body>
+  <div class="timeline-page">
+    <header class="app-header">
+      <a class="app-title" href="timeline.html">🐦 RaiseTimeLine</a>
+      <div class="header-right">
+        <button id="logout-btn">ログアウト</button>
+      </div>
+    </header>
+
+    <h1 id="follow-list-title" class="follow-list-title"></h1>
+    <div id="follow-list-message"></div>
+    <section id="follow-list" class="follow-list card"></section>
+  </div>
+
+<script src="auth.js"></script>
+<script src="users.js"></script>
+<script src="user-ui.js"></script>
+<script src="follow-list.js"></script>
+</body>
+</html>
