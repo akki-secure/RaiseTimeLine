@@ -1,0 +1,95 @@
+.app-header .app-title {
+  text-decoration: none;
+}
+
+.profile-card {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.profile-card.hidden {
+  display: none;
+}
+.profile-avatar {
+  font-size: 40px;
+  line-height: 1;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.profile-display-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #14171a;
+}
+.profile-name-row button {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.profile-name-row button.hidden {
+  display: none;
+}
+.profile-username {
+  font-size: 14px;
+  color: #657786;
+}
+.profile-bio {
+  font-size: 14px;
+  color: #14171a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 4px;
+}
+.profile-bio-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.profile-bio-actions button {
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+.profile-bio-actions .secondary {
+  background: #fff;
+  color: #657786;
+  border: 1px solid #ccd6dd;
+}
+
+#profile-message {
+  margin-bottom: 16px;
+}
+#profile-message.error {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fdecea;
+  color: #c62828;
+  border: 1px solid #f5b5b5;
+}
+
+#load-more-wrap {
+  text-align: center;
+  margin-top: 16px;
+}
+#load-more-btn {
+  width: auto;
+  padding: 8px 20px;
+  font-size: 13px;
+  background: #fff;
+  color: #657786;
+  border: 1px solid #ccd6dd;
+}
+#load-more-btn.hidden {
+  display: none;
+}

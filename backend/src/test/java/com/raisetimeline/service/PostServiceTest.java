@@ -24,12 +24,14 @@ import static org.mockito.Mockito.when;
 class PostServiceTest {
 
     private PostMapper postMapper;
+    private ImageStorageService imageStorageService;
     private PostService postService;
 
     @BeforeEach
     void setUp() {
         postMapper = Mockito.mock(PostMapper.class);
-        postService = new PostService(postMapper);
+        imageStorageService = Mockito.mock(ImageStorageService.class);
+        postService = new PostService(postMapper, imageStorageService);
     }
 
     private PostWithAuthor withAuthor(Long id, Long userId, String body, LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -46,23 +48,16 @@ class PostServiceTest {
 
     @Test
     void create_空本文は例外() {
-        PostRequest req = new PostRequest();
-        req.setBody("   ");
-        assertThrows(RuntimeException.class, () -> postService.create(1L, req));
+        assertThrows(RuntimeException.class, () -> postService.create(1L, "   ", null));
     }
 
     @Test
     void create_281文字は例外() {
-        PostRequest req = new PostRequest();
-        req.setBody("あ".repeat(281));
-        assertThrows(RuntimeException.class, () -> postService.create(1L, req));
+        assertThrows(RuntimeException.class, () -> postService.create(1L, "あ".repeat(281), null));
     }
 
     @Test
     void create_成功時はmineがtrue() {
-        PostRequest req = new PostRequest();
-        req.setBody("こんにちは");
-
         Mockito.doAnswer(invocation -> {
             Post post = invocation.getArgument(0);
             post.setId(10L);
@@ -72,7 +67,7 @@ class PostServiceTest {
         LocalDateTime now = LocalDateTime.now();
         when(postMapper.findById(10L, 1L)).thenReturn(Optional.of(withAuthor(10L, 1L, "こんにちは", now, now)));
 
-        PostResponse res = postService.create(1L, req);
+        PostResponse res = postService.create(1L, "こんにちは", null);
 
         assertTrue(res.isMine());
         assertEquals("こんにちは", res.getBody());

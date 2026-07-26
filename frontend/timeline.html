@@ -11,14 +11,23 @@
   <div class="timeline-page">
     <header class="app-header">
       <span class="app-title">🐦 RaiseTimeLine</span>
+      <div class="header-search">
+        <input id="user-search-input" type="text" placeholder="ユーザーを検索" maxlength="50" autocomplete="off">
+        <div id="user-search-results" class="user-search-results hidden"></div>
+      </div>
       <div class="header-right">
-        <span id="header-username"></span>
+        <a id="header-username"></a>
         <button id="logout-btn">ログアウト</button>
       </div>
     </header>
 
     <section class="post-form card">
       <textarea id="post-body" maxlength="280" placeholder="いまどうしてる？" rows="3"></textarea>
+      <div class="post-form-image">
+        <input type="file" id="post-image-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <img id="post-image-preview" class="hidden" alt="プレビュー">
+        <button id="post-image-remove-btn" class="hidden secondary">画像を削除</button>
+      </div>
       <div class="post-form-footer">
         <span id="char-count">0/280</span>
         <button id="post-submit-btn">投稿</button>
@@ -42,8 +51,10 @@
 
 <script src="auth.js"></script>
 <script src="posts.js"></script>
+<script src="users.js"></script>
 <script src="comments.js"></script>
 <script src="likes.js"></script>
+<script src="post-ui.js"></script>
 <script src="timeline.js"></script>
 </body>
 </html>

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS posts (
     id          BIGSERIAL    PRIMARY KEY,
     user_id     BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     body        TEXT         NOT NULL,
+    image_url   VARCHAR(500),
     created_at  TIMESTAMP    NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMP    NOT NULL DEFAULT NOW()
 );
@@ -60,3 +61,9 @@ CREATE TABLE IF NOT EXISTS likes (
 
 CREATE INDEX IF NOT EXISTS idx_likes_post_id ON likes(post_id);
 CREATE INDEX IF NOT EXISTS idx_likes_user_id ON likes(user_id);
+
+-- =====================================================
+-- 既存DBへのカラム追加（新規インストール時は上記CREATE TABLEで既に含まれるため冪等）
+-- =====================================================
+
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS image_url VARCHAR(500);

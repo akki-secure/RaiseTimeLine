@@ -5,7 +5,7 @@
 <mapper namespace="com.raisetimeline.mapper.PostMapper">
 
     <sql id="selectColumns">
-        p.id, p.user_id, p.body, p.created_at, p.updated_at,
+        p.id, p.user_id, p.body, p.image_url, p.created_at, p.updated_at,
         u.username AS author_username, u.display_name AS author_display_name,
         COUNT(l.id) AS like_count,
         COALESCE(BOOL_OR(l.user_id = #{currentUserId}), false) AS liked_by_me
@@ -33,6 +33,15 @@
         ORDER BY p.id DESC LIMIT #{limit}
     </select>
 
+    <select id="findPageByUserId" resultType="com.raisetimeline.model.PostWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        <include refid="fromJoin"/>
+        WHERE p.user_id = #{userId}
+          AND (CAST(#{beforeId} AS BIGINT) IS NULL OR p.id &lt; CAST(#{beforeId} AS BIGINT))
+        <include refid="groupBy"/>
+        ORDER BY p.id DESC LIMIT #{limit}
+    </select>
+
     <select id="findNewerThan" resultType="com.raisetimeline.model.PostWithAuthor">
         SELECT <include refid="selectColumns"/>
         <include refid="fromJoin"/>
@@ -49,8 +58,8 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO posts (user_id, body, created_at, updated_at)
-        VALUES (#{userId}, #{body}, #{createdAt}, #{updatedAt})
+        INSERT INTO posts (user_id, body, image_url, created_at, updated_at)
+        VALUES (#{userId}, #{body}, #{imageUrl}, #{createdAt}, #{updatedAt})
     </insert>
 
     <!--
@@ -61,7 +70,7 @@
     <select id="updateIfOwner" resultType="com.raisetimeline.model.Post">
         UPDATE posts SET body = #{body}, updated_at = NOW()
         WHERE id = #{id} AND user_id = #{userId}
-        RETURNING id, user_id, body, created_at, updated_at
+        RETURNING id, user_id, body, image_url, created_at, updated_at
     </select>
 
     <delete id="deleteIfOwner">

@@ -4,8 +4,10 @@ import com.raisetimeline.dto.PostRequest;
 import com.raisetimeline.dto.PostResponse;
 import com.raisetimeline.security.CurrentUser;
 import com.raisetimeline.service.PostService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,9 +32,11 @@ public class PostController {
         return ResponseEntity.ok(postService.listPage(CurrentUser.id(), beforeId, limit));
     }
 
-    @PostMapping
-    public ResponseEntity<PostResponse> create(@RequestBody PostRequest req) {
-        return ResponseEntity.ok(postService.create(CurrentUser.id(), req));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResponse> create(
+            @RequestParam("body") String body,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+        return ResponseEntity.ok(postService.create(CurrentUser.id(), body, image));
     }
 
     @PutMapping("/{id}")
