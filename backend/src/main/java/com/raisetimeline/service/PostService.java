@@ -30,14 +30,14 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostResponse> listPage(Long currentUserId, Long beforeId, Integer limit) {
         int clampedLimit = clampLimit(limit);
-        return postMapper.findPage(beforeId, clampedLimit).stream()
+        return postMapper.findPage(beforeId, clampedLimit, currentUserId).stream()
                 .map(p -> new PostResponse(p, p.getUserId().equals(currentUserId)))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<PostResponse> listNewerThan(Long currentUserId, Long afterId) {
-        return postMapper.findNewerThan(afterId).stream()
+        return postMapper.findNewerThan(afterId, currentUserId).stream()
                 .map(p -> new PostResponse(p, p.getUserId().equals(currentUserId)))
                 .toList();
     }
@@ -58,7 +58,7 @@ public class PostService {
         post.setUpdatedAt(now);
         postMapper.insert(post);
 
-        PostWithAuthor saved = postMapper.findById(post.getId())
+        PostWithAuthor saved = postMapper.findById(post.getId(), currentUserId)
                 .orElseThrow(() -> new PostNotFoundException("投稿の作成に失敗しました"));
         return new PostResponse(saved, true);
     }
@@ -69,7 +69,7 @@ public class PostService {
         Post updated = postMapper.updateIfOwner(postId, currentUserId, body)
                 .orElseGet(() -> { throw ownershipFailure(postId, "この投稿を編集する権限がありません"); });
 
-        PostWithAuthor withAuthor = postMapper.findById(updated.getId())
+        PostWithAuthor withAuthor = postMapper.findById(updated.getId(), currentUserId)
                 .orElseThrow(() -> new PostNotFoundException("投稿が見つかりません"));
         return new PostResponse(withAuthor, true);
     }

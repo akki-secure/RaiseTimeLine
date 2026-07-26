@@ -1,5 +1,6 @@
 package com.raisetimeline.controller;
 
+import com.raisetimeline.exception.CommentNotFoundException;
 import com.raisetimeline.exception.ForbiddenException;
 import com.raisetimeline.exception.PostNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(PostNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleCommentNotFound(CommentNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
     }
 

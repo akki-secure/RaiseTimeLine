@@ -121,6 +121,104 @@ body:has(.timeline-page) {
   word-break: break-word;
   margin-bottom: 8px;
 }
+.post-footer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.post-footer button {
+  width: auto;
+  padding: 4px 10px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #ccd6dd;
+}
+.like-btn.liked {
+  color: #e0245e;
+  border-color: #e0245e;
+}
+
+.comments-panel {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e1e8ed;
+}
+.comments-panel.hidden {
+  display: none;
+}
+.comments-list {
+  display: flex;
+  flex-direction: column;
+}
+.comment-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f3f4;
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.comment-author {
+  font-weight: bold;
+  color: #14171a;
+}
+.comment-username,
+.comment-date {
+  color: #657786;
+  font-size: 12px;
+}
+.comment-date {
+  margin-left: auto;
+}
+.comment-body {
+  font-size: 14px;
+  color: #14171a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 4px 0;
+}
+.comment-actions {
+  display: flex;
+  gap: 8px;
+}
+.comment-actions button {
+  width: auto;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.comment-actions .delete-btn,
+.comment-actions .cancel-btn {
+  background: #fff;
+  color: #c62828;
+  border: 1px solid #f5b5b5;
+}
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.comment-form textarea {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ccd6dd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+}
+.comment-form textarea:focus {
+  outline: none;
+  border-color: #1da1f2;
+}
+.comment-form button {
+  width: auto;
+  padding: 6px 14px;
+  align-self: flex-start;
+}
+
 .post-actions {
   display: flex;
   gap: 8px;

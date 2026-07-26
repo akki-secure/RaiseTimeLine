@@ -70,7 +70,7 @@ class PostServiceTest {
         }).when(postMapper).insert(any(Post.class));
 
         LocalDateTime now = LocalDateTime.now();
-        when(postMapper.findById(10L)).thenReturn(Optional.of(withAuthor(10L, 1L, "こんにちは", now, now)));
+        when(postMapper.findById(10L, 1L)).thenReturn(Optional.of(withAuthor(10L, 1L, "こんにちは", now, now)));
 
         PostResponse res = postService.create(1L, req);
 
@@ -82,7 +82,7 @@ class PostServiceTest {
     @Test
     void listPage_他人の投稿はmineがfalse() {
         LocalDateTime now = LocalDateTime.now();
-        when(postMapper.findPage(null, 20)).thenReturn(
+        when(postMapper.findPage(null, 20, 1L)).thenReturn(
                 List.of(withAuthor(1L, 2L, "他人の投稿", now, now)));
 
         List<PostResponse> result = postService.listPage(1L, null, null);
@@ -93,15 +93,15 @@ class PostServiceTest {
 
     @Test
     void listPage_limitは最大50にクランプされる() {
-        when(postMapper.findPage(null, 50)).thenReturn(List.of());
+        when(postMapper.findPage(null, 50, 1L)).thenReturn(List.of());
         postService.listPage(1L, null, 999);
-        Mockito.verify(postMapper).findPage(null, 50);
+        Mockito.verify(postMapper).findPage(null, 50, 1L);
     }
 
     @Test
     void listNewerThan_新着投稿を返す() {
         LocalDateTime now = LocalDateTime.now();
-        when(postMapper.findNewerThan(10L)).thenReturn(
+        when(postMapper.findNewerThan(10L, 1L)).thenReturn(
                 List.of(withAuthor(11L, 2L, "新着", now, now)));
 
         List<PostResponse> result = postService.listNewerThan(1L, 10L);
@@ -126,7 +126,7 @@ class PostServiceTest {
         updated.setUpdatedAt(updatedAt);
 
         when(postMapper.updateIfOwner(5L, 1L, "編集後")).thenReturn(Optional.of(updated));
-        when(postMapper.findById(5L)).thenReturn(Optional.of(withAuthor(5L, 1L, "編集後", createdAt, updatedAt)));
+        when(postMapper.findById(5L, 1L)).thenReturn(Optional.of(withAuthor(5L, 1L, "編集後", createdAt, updatedAt)));
 
         PostResponse res = postService.update(1L, 5L, req);
 
