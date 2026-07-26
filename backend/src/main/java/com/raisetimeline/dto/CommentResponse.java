@@ -1,11 +1,12 @@
 package com.raisetimeline.dto;
 
-import com.raisetimeline.model.PostWithAuthor;
+import com.raisetimeline.model.CommentWithAuthor;
 
 import java.time.LocalDateTime;
 
-public class PostResponse {
+public class CommentResponse {
     private final Long id;
+    private final Long postId;
     private final Long userId;
     private final String username;
     private final String displayName;
@@ -14,24 +15,22 @@ public class PostResponse {
     private final LocalDateTime updatedAt;
     private final boolean edited;
     private final boolean mine;
-    private final int likeCount;
-    private final boolean likedByMe;
 
-    public PostResponse(PostWithAuthor post, boolean mine) {
-        this.id = post.getId();
-        this.userId = post.getUserId();
-        this.username = post.getAuthorUsername();
-        this.displayName = post.getAuthorDisplayName();
-        this.body = post.getBody();
-        this.createdAt = post.getCreatedAt();
-        this.updatedAt = post.getUpdatedAt();
-        this.edited = !post.getUpdatedAt().equals(post.getCreatedAt());
+    public CommentResponse(CommentWithAuthor comment, boolean mine) {
+        this.id = comment.getId();
+        this.postId = comment.getPostId();
+        this.userId = comment.getUserId();
+        this.username = comment.getAuthorUsername();
+        this.displayName = comment.getAuthorDisplayName();
+        this.body = comment.getBody();
+        this.createdAt = comment.getCreatedAt();
+        this.updatedAt = comment.getUpdatedAt();
+        this.edited = !comment.getUpdatedAt().equals(comment.getCreatedAt());
         this.mine = mine;
-        this.likeCount = post.getLikeCount();
-        this.likedByMe = post.isLikedByMe();
     }
 
     public Long getId() { return id; }
+    public Long getPostId() { return postId; }
     public Long getUserId() { return userId; }
     public String getUsername() { return username; }
     public String getDisplayName() { return displayName; }
@@ -40,6 +39,4 @@ public class PostResponse {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public boolean isEdited() { return edited; }
     public boolean isMine() { return mine; }
-    public int getLikeCount() { return likeCount; }
-    public boolean isLikedByMe() { return likedByMe; }
 }

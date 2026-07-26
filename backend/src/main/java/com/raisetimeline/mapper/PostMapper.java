@@ -17,25 +17,32 @@ public interface PostMapper {
 
     String SELECT_COLUMNS =
             "p.id, p.user_id, p.body, p.created_at, p.updated_at, " +
-            "u.username AS author_username, u.display_name AS author_display_name ";
+            "u.username AS author_username, u.display_name AS author_display_name, " +
+            "COUNT(l.id) AS like_count, " +
+            "COALESCE(BOOL_OR(l.user_id = #{currentUserId}), false) AS liked_by_me ";
+
+    String FROM_JOIN =
+            "FROM posts p JOIN users u ON u.id = p.user_id " +
+            "LEFT JOIN likes l ON l.post_id = p.id ";
+
+    // p.id/u.idでGROUP BYすれば、それらに関数従属する他の列（p.body等）もSELECTできる（PostgreSQLの仕様）。
+    String GROUP_BY = "GROUP BY p.id, u.id ";
 
     // idはBIGSERIALで挿入順に単調増加し、編集ではid/created_atとも変化しないため、
     // idだけを安定したページネーションカーソルとして使える（offset方式と違い新着投稿が挟まっても重複/欠落しない）。
-    @Select("SELECT " + SELECT_COLUMNS +
-            "FROM posts p JOIN users u ON u.id = p.user_id " +
+    @Select("SELECT " + SELECT_COLUMNS + FROM_JOIN +
             "WHERE (CAST(#{beforeId} AS BIGINT) IS NULL OR p.id < CAST(#{beforeId} AS BIGINT)) " +
-            "ORDER BY p.id DESC LIMIT #{limit}")
-    List<PostWithAuthor> findPage(@Param("beforeId") Long beforeId, @Param("limit") int limit);
+            GROUP_BY + "ORDER BY p.id DESC LIMIT #{limit}")
+    List<PostWithAuthor> findPage(@Param("beforeId") Long beforeId, @Param("limit") int limit,
+                                   @Param("currentUserId") Long currentUserId);
 
-    @Select("SELECT " + SELECT_COLUMNS +
-            "FROM posts p JOIN users u ON u.id = p.user_id " +
-            "WHERE p.id > #{afterId} ORDER BY p.id DESC")
-    List<PostWithAuthor> findNewerThan(@Param("afterId") Long afterId);
+    @Select("SELECT " + SELECT_COLUMNS + FROM_JOIN +
+            "WHERE p.id > #{afterId} " + GROUP_BY + "ORDER BY p.id DESC")
+    List<PostWithAuthor> findNewerThan(@Param("afterId") Long afterId, @Param("currentUserId") Long currentUserId);
 
-    @Select("SELECT " + SELECT_COLUMNS +
-            "FROM posts p JOIN users u ON u.id = p.user_id " +
-            "WHERE p.id = #{id}")
-    Optional<PostWithAuthor> findById(@Param("id") Long id);
+    @Select("SELECT " + SELECT_COLUMNS + FROM_JOIN +
+            "WHERE p.id = #{id} " + GROUP_BY)
+    Optional<PostWithAuthor> findById(@Param("id") Long id, @Param("currentUserId") Long currentUserId);
 
     @Insert("INSERT INTO posts (user_id, body, created_at, updated_at) " +
             "VALUES (#{userId}, #{body}, #{createdAt}, #{updatedAt})")

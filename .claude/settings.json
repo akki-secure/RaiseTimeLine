@@ -40,5 +40,28 @@
       "Bash(docker compose down --volumes*)",
       "Bash(docker compose down -v*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(*bootRun*)",
+            "command": "cd backend && JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null || echo $JAVA_HOME) ./gradlew test --console=plain > /tmp/quality-check-backend.log 2>&1 || echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"品質チェック(backend: ./gradlew test)が失敗したため起動をブロックしました。ログ: /tmp/quality-check-backend.log\"}}'",
+            "timeout": 180,
+            "statusMessage": "品質チェック(backend: gradle test)を実行中..."
+          },
+          {
+            "type": "command",
+            "if": "Bash(*npm run dev*)",
+            "command": "if [ -f frontend/package.json ]; then (cd frontend && npm run lint --if-present && npm run build --if-present) > /tmp/quality-check-frontend.log 2>&1 || echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"品質チェック(frontend: lint/build)が失敗したため起動をブロックしました。ログ: /tmp/quality-check-frontend.log\"}}'; fi",
+            "timeout": 120,
+            "statusMessage": "品質チェック(frontend: lint/build)を実行中..."
+          }
+        ]
+      }
+    ]
   }
 }
