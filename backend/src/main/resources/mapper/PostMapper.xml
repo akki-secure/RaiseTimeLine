@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raisetimeline.mapper.PostMapper">
+
+    <sql id="selectColumns">
+        p.id, p.user_id, p.body, p.created_at, p.updated_at,
+        u.username AS author_username, u.display_name AS author_display_name,
+        COUNT(l.id) AS like_count,
+        COALESCE(BOOL_OR(l.user_id = #{currentUserId}), false) AS liked_by_me
+    </sql>
+
+    <sql id="fromJoin">
+        FROM posts p JOIN users u ON u.id = p.user_id
+        LEFT JOIN likes l ON l.post_id = p.id
+    </sql>
+
+    <!-- p.id/u.idでGROUP BYすれば、それらに関数従属する他の列（p.body等）もSELECTできる（PostgreSQLの仕様）。 -->
+    <sql id="groupBy">
+        GROUP BY p.id, u.id
+    </sql>
+
+    <!--
+        idはBIGSERIALで挿入順に単調増加し、編集ではid/created_atとも変化しないため、
+        idだけを安定したページネーションカーソルとして使える（offset方式と違い新着投稿が挟まっても重複/欠落しない）。
+    -->
+    <select id="findPage" resultType="com.raisetimeline.model.PostWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        <include refid="fromJoin"/>
+        WHERE (CAST(#{beforeId} AS BIGINT) IS NULL OR p.id &lt; CAST(#{beforeId} AS BIGINT))
+        <include refid="groupBy"/>
+        ORDER BY p.id DESC LIMIT #{limit}
+    </select>
+
+    <select id="findNewerThan" resultType="com.raisetimeline.model.PostWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        <include refid="fromJoin"/>
+        WHERE p.id &gt; #{afterId}
+        <include refid="groupBy"/>
+        ORDER BY p.id DESC
+    </select>
+
+    <select id="findById" resultType="com.raisetimeline.model.PostWithAuthor">
+        SELECT <include refid="selectColumns"/>
+        <include refid="fromJoin"/>
+        WHERE p.id = #{id}
+        <include refid="groupBy"/>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (user_id, body, created_at, updated_at)
+        VALUES (#{userId}, #{body}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!--
+        所有権チェックと更新をアトミックに行う。RefreshTokenMapper.revokeIfValidと同じ設計で、
+        「本人の投稿か」の検証と本体の更新を分けないことでTOCTOU競合を防ぐ。
+        RETURNINGで結果を受け取るためMyBatis上は<update>ではなく<select>として扱う。
+    -->
+    <select id="updateIfOwner" resultType="com.raisetimeline.model.Post">
+        UPDATE posts SET body = #{body}, updated_at = NOW()
+        WHERE id = #{id} AND user_id = #{userId}
+        RETURNING id, user_id, body, created_at, updated_at
+    </select>
+
+    <delete id="deleteIfOwner">
+        DELETE FROM posts WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+    <select id="existsById" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM posts WHERE id = #{id})
+    </select>
+
+</mapper>
