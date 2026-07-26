@@ -43,6 +43,23 @@
   font-size: 14px;
   color: #657786;
 }
+.profile-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+.profile-stat {
+  font-size: 13px;
+  color: #657786;
+  text-decoration: none;
+}
+.profile-stat:hover {
+  text-decoration: underline;
+}
+.profile-stat span {
+  font-weight: bold;
+  color: #14171a;
+}
 .profile-bio {
   font-size: 14px;
   color: #14171a;

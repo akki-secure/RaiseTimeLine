@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.raisetimeline.mapper.FollowMapper">
+
+    <!-- UNIQUE(follower_id, followee_id)違反をON CONFLICT DO NOTHINGで吸収する。 -->
+    <insert id="insertIfAbsent">
+        INSERT INTO follows (follower_id, followee_id, created_at)
+        VALUES (#{followerId}, #{followeeId}, NOW())
+        ON CONFLICT (follower_id, followee_id) DO NOTHING
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM follows WHERE follower_id = #{followerId} AND followee_id = #{followeeId}
+    </delete>
+
+    <select id="countByFollower" resultType="int">
+        SELECT COUNT(*) FROM follows WHERE follower_id = #{userId}
+    </select>
+
+    <select id="countByFollowee" resultType="int">
+        SELECT COUNT(*) FROM follows WHERE followee_id = #{userId}
+    </select>
+
+    <select id="exists" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM follows WHERE follower_id = #{followerId} AND followee_id = #{followeeId})
+    </select>
+
+    <sql id="userColumns">
+        u.id, u.email, u.password_hash, u.username, u.display_name, u.bio, u.avatar_url, u.created_at, u.updated_at
+    </sql>
+
+    <select id="findFollowing" resultType="com.raisetimeline.model.User">
+        SELECT <include refid="userColumns"/>
+        FROM follows f JOIN users u ON u.id = f.followee_id
+        WHERE f.follower_id = #{userId}
+        ORDER BY f.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findFollowers" resultType="com.raisetimeline.model.User">
+        SELECT <include refid="userColumns"/>
+        FROM follows f JOIN users u ON u.id = f.follower_id
+        WHERE f.followee_id = #{userId}
+        ORDER BY f.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findSuggestions" resultType="com.raisetimeline.model.User">
+        SELECT <include refid="userColumns"/>
+        FROM users u
+        WHERE u.id &lt;&gt; #{currentUserId}
+          AND NOT EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = #{currentUserId} AND f.followee_id = u.id)
+        ORDER BY u.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

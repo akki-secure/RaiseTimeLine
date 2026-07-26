@@ -2,6 +2,7 @@ package com.raisetimeline.controller;
 
 import com.raisetimeline.dto.PostResponse;
 import com.raisetimeline.dto.UpdateBioRequest;
+import com.raisetimeline.dto.UserProfileResponse;
 import com.raisetimeline.dto.UserSummaryResponse;
 import com.raisetimeline.security.CurrentUser;
 import com.raisetimeline.service.PostService;
@@ -29,8 +30,8 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserSummaryResponse> getProfile(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getProfile(username));
+    public ResponseEntity<UserProfileResponse> getProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getProfile(username, CurrentUser.id()));
     }
 
     @GetMapping("/{username}/posts")
@@ -38,7 +39,7 @@ public class UserController {
             @PathVariable String username,
             @RequestParam(required = false) Long beforeId,
             @RequestParam(required = false) Integer limit) {
-        UserSummaryResponse profile = userService.getProfile(username);
+        UserProfileResponse profile = userService.getProfile(username, CurrentUser.id());
         return ResponseEntity.ok(postService.listPageByUserId(CurrentUser.id(), profile.getId(), beforeId, limit));
     }
 
