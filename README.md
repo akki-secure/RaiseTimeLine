@@ -28,10 +28,10 @@ X(Twitter)風のタイムライン型SNSアプリです。学習目的で個人�
 | データベース | PostgreSQL 16 |
 | DBアクセス | MyBatis（mybatis-spring-boot-starter 3.0.3、XMLマッパー方式） |
 | 認証 | JWT（jjwt 0.12.6）+ BCrypt |
-| 画像ストレージ | ローカルディスク（`backend/uploads/images/`）+ Spring Bootの静的リソース配信 |
+| 画像ストレージ | AWS S3（パブリックread、AWS SDK for Java v2） |
 | ローカル開発環境 | Docker / docker-compose |
 
-> 設計時点（[docs/requirements.md](docs/requirements.md)）ではフロントエンドをReact + Vite、画像ストレージをAWS S3とする想定でしたが、学習用途のシンプルさを優先し、実装ではビルド不要の素のHTML/JS/CSSとローカルディスク保存に変更しています。
+> 設計時点（[docs/requirements.md](docs/requirements.md)）ではフロントエンドをReact + Viteとする想定でしたが、学習用途のシンプルさを優先し、実装ではビルド不要の素のHTML/JS/CSSに変更しています。画像ストレージは設計通りAWS S3を使用しています（[docs/aws.md](docs/aws.md)のS3構成方針、確認方法は[docs/s3-console-guide.md](docs/s3-console-guide.md)を参照）。
 
 ## ER図
 
@@ -190,7 +190,7 @@ python3 -m http.server 5500
 http://localhost:5500/login.html
 ```
 
-> バックエンドの接続設定は `backend/src/main/resources/application.properties` で変更できます。`app.upload.dir`でアップロード画像の保存先ディレクトリを、`spring.datasource.*`でDB接続先を変更できます。
+> バックエンドの接続設定は `backend/src/main/resources/application.properties` で変更できます。`app.s3.bucket-name`/`app.s3.region`で画像保存先のS3バケット・リージョンを、`spring.datasource.*`でDB接続先を変更できます。S3へのアクセス認証情報はコードや設定ファイルに含めず、`~/.aws/credentials`等のデフォルトクレデンシャルチェーンから取得します。
 
 ## テスト用ユーザー
 
