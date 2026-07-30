@@ -4,11 +4,22 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.raisetimeline.mapper.FollowMapper">
 
-    <!-- UNIQUE(follower_id, followee_id)違反をON CONFLICT DO NOTHINGで吸収する。 -->
-    <insert id="insertIfAbsent">
+    <!-- UNIQUE(follower_id, followee_id)違反をON CONFLICT DO NOTHINGで吸収する(PostgreSQL用)。 -->
+    <insert id="insertIfAbsent" databaseId="postgresql">
         INSERT INTO follows (follower_id, followee_id, created_at)
         VALUES (#{followerId}, #{followeeId}, NOW())
         ON CONFLICT (follower_id, followee_id) DO NOTHING
+    </insert>
+
+    <!--
+        H2はON CONFLICT句自体を未サポート(2.3系で確認)のため、H2ネイティブのUPSERT構文MERGE INTOで代替する。
+        KEY(follower_id, followee_id)が一致する行があればcreated_atを上書きするだけになりDO NOTHINGと
+        完全に同一ではないが、本テストで検証する範囲(exists/countの変化なし)には影響しないためテスト専用として許容する。
+    -->
+    <insert id="insertIfAbsent" databaseId="h2">
+        MERGE INTO follows (follower_id, followee_id, created_at)
+        KEY (follower_id, followee_id)
+        VALUES (#{followerId}, #{followeeId}, NOW())
     </insert>
 
     <delete id="delete">

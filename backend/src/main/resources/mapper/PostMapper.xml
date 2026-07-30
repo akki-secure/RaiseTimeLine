@@ -66,6 +66,9 @@
         所有権チェックと更新をアトミックに行う。RefreshTokenMapper.revokeIfValidと同じ設計で、
         「本人の投稿か」の検証と本体の更新を分けないことでTOCTOU競合を防ぐ。
         RETURNINGで結果を受け取るためMyBatis上は<update>ではなく<select>として扱う。
+        H2はRETURNING句を未サポートのためMapper単体テスト(H2実SQL実行)の対象外とし、
+        本番PostgreSQLでの並行性保証を偽って検証しないようにする。所有者一致/不一致の分岐は
+        PostServiceTestでMockitoによりPostMapper.updateIfOwnerの戻り値をスタブして検証する。
     -->
     <select id="updateIfOwner" resultType="com.raisetimeline.model.Post">
         UPDATE posts SET body = #{body}, updated_at = NOW()
