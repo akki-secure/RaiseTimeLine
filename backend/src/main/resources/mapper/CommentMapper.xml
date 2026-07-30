@@ -31,6 +31,8 @@
         所有権チェックと更新をアトミックに行う（PostMapper.updateIfOwnerと同じ設計）。
         post_idも条件に含め、URLパスのpostIdとコメントの実際の親投稿が一致することも保証する。
         RETURNINGで結果を受け取るためMyBatis上は<update>ではなく<select>として扱う。
+        H2はRETURNING句を未サポートのためMapper単体テスト(H2実SQL実行)の対象外とし、
+        所有者一致/不一致の分岐はCommentServiceTestでMockitoにより戻り値をスタブして検証する。
     -->
     <select id="updateIfOwner" resultType="com.raisetimeline.model.Comment">
         UPDATE comments SET body = #{body}, updated_at = NOW()
