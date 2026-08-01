@@ -18,6 +18,7 @@ X(Twitter)風タイムラインSNSアプリの設計ドキュメント。学習�
 5. [er.md](./er.md) — ER図・テーブル定義
 6. [aws.md](./aws.md) — AWSインフラ構成（想定案、未確定部分あり）
 7. [logging-operations.md](./logging-operations.md) — ログ運用・監視設計（構造化ログのフォーマット、保存・保持方針、監視の考え方）
+8. [testing.md](./testing.md) — テスト方針（なぜテストを書くのか、レイヤーごとのテスト方針、スコープ外）
 
 ## 技術スタック概要
 
