@@ -17,6 +17,7 @@ X(Twitter)風タイムラインSNSアプリの設計ドキュメント。学習�
 4. [screens.md](./screens.md) — 画面設計（画面一覧・画面遷移図・簡易ワイヤーフレーム）
 5. [er.md](./er.md) — ER図・テーブル定義
 6. [aws.md](./aws.md) — AWSインフラ構成（想定案、未確定部分あり）
+7. [logging-operations.md](./logging-operations.md) — ログ運用・監視設計（構造化ログのフォーマット、保存・保持方針、監視の考え方）
 
 ## 技術スタック概要
 

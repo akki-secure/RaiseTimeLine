@@ -4,6 +4,7 @@ import com.raisetimeline.dto.PostRequest;
 import com.raisetimeline.dto.PostResponse;
 import com.raisetimeline.exception.ForbiddenException;
 import com.raisetimeline.exception.PostNotFoundException;
+import com.raisetimeline.exception.ValidationException;
 import com.raisetimeline.mapper.PostMapper;
 import com.raisetimeline.model.Post;
 import com.raisetimeline.model.PostWithAuthor;
@@ -104,9 +105,9 @@ public class PostService {
     private String validateBody(String rawBody) {
         String body = rawBody == null ? null : rawBody.strip();
         if (body == null || body.isEmpty())
-            throw new RuntimeException("投稿本文を入力してください");
+            throw new ValidationException("投稿本文を入力してください");
         if (body.length() > BODY_MAX_LENGTH)
-            throw new RuntimeException("投稿本文は280文字以内で入力してください");
+            throw new ValidationException("投稿本文は280文字以内で入力してください");
         return body;
     }
 }
