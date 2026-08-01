@@ -146,6 +146,7 @@ flowchart LR
 | [docs/screens.md](docs/screens.md) | 画面設計（画面一覧・画面遷移図・簡易ワイヤーフレーム） |
 | [docs/er.md](docs/er.md) | ER図・テーブル定義 |
 | [docs/aws.md](docs/aws.md) | AWSインフラ構成（想定案） |
+| [docs/testing.md](docs/testing.md) | テスト方針（なぜテストを書くのか、レイヤーごとの方針） |
 
 ## 必要な環境
 
