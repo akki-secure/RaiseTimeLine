@@ -5,6 +5,7 @@ import com.raisetimeline.dto.CommentResponse;
 import com.raisetimeline.exception.CommentNotFoundException;
 import com.raisetimeline.exception.ForbiddenException;
 import com.raisetimeline.exception.PostNotFoundException;
+import com.raisetimeline.exception.ValidationException;
 import com.raisetimeline.mapper.CommentMapper;
 import com.raisetimeline.mapper.PostMapper;
 import com.raisetimeline.model.Comment;
@@ -85,9 +86,9 @@ public class CommentService {
     private String validateBody(String rawBody) {
         String body = rawBody == null ? null : rawBody.strip();
         if (body == null || body.isEmpty())
-            throw new RuntimeException("コメント本文を入力してください");
+            throw new ValidationException("コメント本文を入力してください");
         if (body.length() > BODY_MAX_LENGTH)
-            throw new RuntimeException("コメントは280文字以内で入力してください");
+            throw new ValidationException("コメントは280文字以内で入力してください");
         return body;
     }
 }

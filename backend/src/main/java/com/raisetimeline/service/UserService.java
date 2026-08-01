@@ -3,6 +3,7 @@ package com.raisetimeline.service;
 import com.raisetimeline.dto.UserProfileResponse;
 import com.raisetimeline.dto.UserSummaryResponse;
 import com.raisetimeline.exception.UserNotFoundException;
+import com.raisetimeline.exception.ValidationException;
 import com.raisetimeline.mapper.FollowMapper;
 import com.raisetimeline.mapper.UserMapper;
 import com.raisetimeline.model.User;
@@ -41,7 +42,7 @@ public class UserService {
     public UserSummaryResponse updateBio(Long userId, String rawBio) {
         String bio = rawBio == null ? "" : rawBio.strip();
         if (bio.length() > BIO_MAX_LENGTH)
-            throw new RuntimeException("自己紹介は160文字以内で入力してください");
+            throw new ValidationException("自己紹介は160文字以内で入力してください");
 
         userMapper.updateBio(userId, bio);
         User user = userMapper.findById(userId)
@@ -53,7 +54,7 @@ public class UserService {
         String keyword = q == null ? "" : q.strip();
         if (keyword.isEmpty()) return List.of();
         if (keyword.length() > MAX_KEYWORD_LENGTH)
-            throw new RuntimeException("検索キーワードは50文字以内で入力してください");
+            throw new ValidationException("検索キーワードは50文字以内で入力してください");
 
         String pattern = "%" + escapeLikePattern(keyword) + "%";
         return userMapper.searchByKeyword(pattern, currentUserId, SEARCH_LIMIT).stream()

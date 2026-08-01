@@ -17,6 +17,7 @@ backend/build/
 backend/.gradle/
 backend/out/
 backend/uploads/
+backend/logs/
 
 # Claude Code local settings
 .claude/settings.local.json

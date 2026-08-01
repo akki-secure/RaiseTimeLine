@@ -4,11 +4,14 @@ import com.raisetimeline.dto.AuthResponse;
 import com.raisetimeline.dto.LoginRequest;
 import com.raisetimeline.dto.RefreshTokenRequest;
 import com.raisetimeline.dto.RegisterRequest;
+import com.raisetimeline.exception.ValidationException;
 import com.raisetimeline.mapper.RefreshTokenMapper;
 import com.raisetimeline.mapper.UserMapper;
 import com.raisetimeline.model.RefreshToken;
 import com.raisetimeline.model.User;
 import com.raisetimeline.security.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +21,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Service
 @Transactional
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[^\\s\\u3000\\p{Cntrl}]{3,20}$");
@@ -45,18 +52,18 @@ public class AuthService {
         String displayName = req.getDisplayName() == null ? null : req.getDisplayName().strip();
 
         if (email == null || email.isBlank() || !EMAIL_PATTERN.matcher(email).matches())
-            throw new RuntimeException("メールアドレスの形式が正しくありません");
+            throw new ValidationException("メールアドレスの形式が正しくありません");
         if (password == null || password.length() < 8)
-            throw new RuntimeException("パスワードは8文字以上で入力してください");
+            throw new ValidationException("パスワードは8文字以上で入力してください");
         if (username == null || !USERNAME_PATTERN.matcher(username).matches())
-            throw new RuntimeException("ユーザー名は空白を含まない3〜20文字で入力してください");
+            throw new ValidationException("ユーザー名は空白を含まない3〜20文字で入力してください");
         if (displayName == null || displayName.isBlank() || displayName.length() > 50)
-            throw new RuntimeException("表示名は1〜50文字で入力してください");
+            throw new ValidationException("表示名は1〜50文字で入力してください");
 
         if (userMapper.existsByEmail(email))
-            throw new RuntimeException("このメールアドレスはすでに登録されています");
+            throw new ValidationException("このメールアドレスはすでに登録されています");
         if (userMapper.existsByUsername(username))
-            throw new RuntimeException("このユーザー名はすでに使用されています");
+            throw new ValidationException("このユーザー名はすでに使用されています");
 
         User user = new User();
         user.setEmail(email);
@@ -72,29 +79,37 @@ public class AuthService {
         String email = req.getEmail() == null ? null : req.getEmail().strip();
         String password = req.getPassword();
 
-        if (email == null || email.isBlank() || password == null || password.isBlank())
-            throw new RuntimeException("メールアドレスまたはパスワードが正しくありません");
+        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+            log.warn("login_failed", kv("email", email), kv("reason", "blank_credentials"));
+            throw new ValidationException("メールアドレスまたはパスワードが正しくありません");
+        }
 
         Optional<User> userOpt = userMapper.findByEmail(email);
-        User user = userOpt.orElseThrow(() -> new RuntimeException("メールアドレスまたはパスワードが正しくありません"));
+        User user = userOpt.orElseThrow(() -> {
+            log.warn("login_failed", kv("email", email), kv("reason", "email_not_found"));
+            return new ValidationException("メールアドレスまたはパスワードが正しくありません");
+        });
 
-        if (!encoder.matches(password, user.getPasswordHash()))
-            throw new RuntimeException("メールアドレスまたはパスワードが正しくありません");
+        if (!encoder.matches(password, user.getPasswordHash())) {
+            log.warn("login_failed", kv("email", email), kv("reason", "password_mismatch"));
+            throw new ValidationException("メールアドレスまたはパスワードが正しくありません");
+        }
 
+        log.info("login_success", kv("userId", user.getId()));
         return issueTokens(user);
     }
 
     public AuthResponse refresh(RefreshTokenRequest req) {
         String rawToken = req.getRefreshToken();
         if (rawToken == null || rawToken.isBlank())
-            throw new RuntimeException("リフレッシュトークンが不正です");
+            throw new ValidationException("リフレッシュトークンが不正です");
 
         String hash = jwtUtil.hashToken(rawToken);
         RefreshToken stored = refreshTokenMapper.revokeIfValid(hash)
-                .orElseThrow(() -> new RuntimeException("リフレッシュトークンが無効です"));
+                .orElseThrow(() -> new ValidationException("リフレッシュトークンが無効です"));
 
         User user = userMapper.findById(stored.getUserId())
-                .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+                .orElseThrow(() -> new ValidationException("ユーザーが見つかりません"));
 
         return issueTokens(user);
     }

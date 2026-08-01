@@ -3,6 +3,7 @@ package com.raisetimeline.service;
 import com.raisetimeline.dto.FollowResponse;
 import com.raisetimeline.dto.UserSummaryResponse;
 import com.raisetimeline.exception.UserNotFoundException;
+import com.raisetimeline.exception.ValidationException;
 import com.raisetimeline.mapper.FollowMapper;
 import com.raisetimeline.mapper.UserMapper;
 import com.raisetimeline.model.User;
@@ -32,7 +33,7 @@ public class FollowService {
     public FollowResponse toggle(Long currentUserId, String targetUsername) {
         User target = findByUsername(targetUsername);
         if (target.getId().equals(currentUserId))
-            throw new RuntimeException("自分自身をフォローすることはできません");
+            throw new ValidationException("自分自身をフォローすることはできません");
 
         int deleted = followMapper.delete(currentUserId, target.getId());
         boolean followed;
