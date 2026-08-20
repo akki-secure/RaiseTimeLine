@@ -147,6 +147,8 @@ flowchart LR
 | [docs/er.md](docs/er.md) | ER図・テーブル定義 |
 | [docs/aws.md](docs/aws.md) | AWSインフラ構成（想定案） |
 | [docs/testing.md](docs/testing.md) | テスト方針（なぜテストを書くのか、レイヤーごとの方針） |
+| [e2e/README.md](e2e/README.md) | E2Eテスト（Playwright）・ブラウザパフォーマンス計測の実行方法 |
+| [perf-test/README.md](perf-test/README.md) | APIパフォーマンステスト（k6）の実行方法 |
 
 ## 必要な環境
 

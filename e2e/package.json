@@ -1,0 +1,15 @@
+{
+  "name": "raisetimeline-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test tests/scenarios",
+    "test:perf": "playwright test tests/perf",
+    "test:headed": "playwright test tests/scenarios --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
