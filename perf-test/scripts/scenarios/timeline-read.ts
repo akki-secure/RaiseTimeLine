@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { login, authHeaders } from '../lib/auth.js';
-import { BASE_URL, randomPerfEmail } from '../lib/config.js';
+import { login, authHeaders } from '../lib/auth.ts';
+import { BASE_URL, randomPerfEmail } from '../lib/config.ts';
 
 // タイムライン取得API（GET /api/posts、カーソルページング）の負荷テスト。
 // 1ユーザーが最初のページを取得後、beforeIdを引き継いで連鎖的にページングする挙動を再現する。
@@ -22,19 +22,23 @@ export const options = {
   },
 };
 
-export function setup() {
+interface SetupData {
+  token: string | null;
+}
+
+export function setup(): SetupData {
   const token = login(randomPerfEmail());
   return { token };
 }
 
-export default function (data) {
+export default function (data: SetupData) {
   if (!data.token) return;
   const opts = Object.assign({ tags: { name: 'timeline_page1' } }, authHeaders(data.token));
 
   const first = http.get(`${BASE_URL}/api/posts?limit=20`, opts);
   check(first, { 'page1: status is 200': (r) => r.status === 200 });
 
-  const posts = first.status === 200 ? first.json() : [];
+  const posts = first.status === 200 ? (first.json() as Array<{ id: number }>) : [];
   if (Array.isArray(posts) && posts.length > 0) {
     const beforeId = posts[posts.length - 1].id;
     const nextOpts = Object.assign({ tags: { name: 'timeline_page2' } }, authHeaders(data.token));

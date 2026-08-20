@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { login, authHeaders } from '../lib/auth.js';
-import { BASE_URL, randomPerfEmail } from '../lib/config.js';
+import { login } from '../lib/auth.ts';
+import { BASE_URL, randomPerfEmail } from '../lib/config.ts';
 
 // 投稿作成API（POST /api/posts、multipart/form-data）の負荷テスト。
 // テキストのみの投稿を対象とする。画像アップロードはAWS S3の認証情報が必要になるため
@@ -23,12 +23,16 @@ export const options = {
   },
 };
 
-export function setup() {
+interface SetupData {
+  token: string | null;
+}
+
+export function setup(): SetupData {
   const token = login(randomPerfEmail());
   return { token };
 }
 
-export default function (data) {
+export default function (data: SetupData) {
   if (!data.token) return;
   // k6のhttp.postはプレーンオブジェクトを渡すとapplication/x-www-form-urlencodedで
   // エンコードしてしまう（http.file()を含む場合のみ自動でmultipart/form-dataになる）。

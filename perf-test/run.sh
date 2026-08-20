@@ -13,11 +13,11 @@ shift || true
 if [[ -z "$SCENARIO" ]]; then
   echo "使い方: $0 <scenario> [k6オプション...]"
   echo "利用可能なシナリオ:"
-  ls "$SCRIPT_DIR/scripts/scenarios" | sed 's/\.js$//' | sed 's/^/  - /'
+  ls "$SCRIPT_DIR/scripts/scenarios" | sed 's/\.ts$//' | sed 's/^/  - /'
   exit 1
 fi
 
-SCENARIO_FILE="$SCRIPT_DIR/scripts/scenarios/$SCENARIO.js"
+SCENARIO_FILE="$SCRIPT_DIR/scripts/scenarios/$SCENARIO.ts"
 if [[ ! -f "$SCENARIO_FILE" ]]; then
   echo "シナリオファイルが見つかりません: $SCENARIO_FILE"
   exit 1
