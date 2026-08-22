@@ -1,6 +1,6 @@
 import { sleep } from 'k6';
-import { login } from '../lib/auth.js';
-import { randomPerfEmail } from '../lib/config.js';
+import { login } from '../lib/auth.ts';
+import { randomPerfEmail } from '../lib/config.ts';
 
 // ログインAPI（BCrypt検証込み）の負荷テスト。
 // 事前に scripts/seed/seed-bulk.sql でperfユーザーを投入しておくこと。

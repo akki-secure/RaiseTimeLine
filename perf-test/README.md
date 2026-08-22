@@ -6,11 +6,17 @@ RaiseTimeLineの主要APIに対する負荷テスト（[k6](https://k6.io/)）�
 
 ## 前提条件
 
-1. k6をインストールする
+1. k6をインストールする（v0.57以降が必要。TypeScriptファイル(.ts)をネイティブに実行できる）
    ```
    brew install k6
    ```
    （Homebrewを使わない場合はDockerイメージ `grafana/k6` でも実行可能）
+
+   エディタで型補完・型チェックを効かせたい場合は、`perf-test/`配下で以下を実行する（実行時のビルドには不要）。
+   ```
+   npm install
+   npx tsc --noEmit
+   ```
 
 2. DBとバックエンドを起動する
    ```
@@ -88,4 +94,4 @@ TARGET_POST_ID=1234 ./perf-test/run.sh like-toggle
 python3 -c "import bcrypt; print(bcrypt.hashpw(b'perfpass123', bcrypt.gensalt(10)).decode())"
 ```
 
-パスワードを変更したい場合は、生成したハッシュを `seed-bulk.sql` に反映し、`perf-test/scripts/lib/config.js` の `PERF_PASSWORD` も合わせて変更してください。
+パスワードを変更したい場合は、生成したハッシュを `seed-bulk.sql` に反映し、`perf-test/scripts/lib/config.ts` の `PERF_PASSWORD` も合わせて変更してください。

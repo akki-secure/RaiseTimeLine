@@ -1,0 +1,9 @@
+{
+  "name": "raisetimeline-perf-test",
+  "private": true,
+  "description": "k6負荷テストの型チェック用（実行はk6ネイティブTypeScriptサポートで行うためビルド不要）",
+  "devDependencies": {
+    "@types/k6": "^1.0.1",
+    "typescript": "^5.6.0"
+  }
+}
